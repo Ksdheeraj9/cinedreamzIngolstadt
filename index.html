@@ -60,16 +60,68 @@
             text-align: center;
             margin-top: 10px;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            width: 45%;
+        }
+        .bank-details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .bank-details p {
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <h2 id="paymentModalTitle">Payment Confirmation</h2>
+            <div id="paymentModalContent">
+                <!-- Content will be dynamically inserted -->
+            </div>
+            <div class="modal-buttons">
+                <button onclick="cancelPayment()">Cancel</button>
+                <button onclick="proceedWithPayment()" style="background-color: #0070ba;">Proceed</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
+        <!-- Rest of your existing HTML remains the same until the script tag -->
         <div class="header">
             <h1>Cine Dreamz Ingolstadt</h1>
             <h2>Movie Booking</h2>
         </div>
 
-        <img src="/api/placeholder/400/600" alt="Movie Poster" class="poster">
+        <img src="https://sanskarsavvy.com/wp-content/uploads/2024/11/NEWS-PAGE-HEADERS-57.jpg" alt="Movie Poster" class="poster">
 
         <form id="bookingForm" onsubmit="return handleSubmit(event)">
             <div class="form-group">
@@ -125,39 +177,76 @@
 
     <script>
         // Replace this with your Google Apps Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykemLwDUYrJNTuTWebidB-hpKezpBa98erxnlvd3oT35t4LRMorO4YchlWmQiYfPSo/exec';
-        
-        async function checkAvailability() {
-            try {
-                const response = await fetch(SCRIPT_URL);
-                const data = await response.json();
-                
-                // Update UI based on availability
-                ['hindi', 'telugu'].forEach(show => {
-                    if (data[show] >= 200) {
-                        updateAvailability(show);
-                    }
-                });
-            } catch (error) {
-                console.error('Error checking availability:', error);
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+        const PAYPAL_LINK = 'https://paypal.me/Shivadheeraj?country.x=DE&locale.x=en_US';
+        const BANK_DETAILS = {
+            name: 'SHIVA D. KAMMA',
+            iban: 'DE89 7004 0045 0830 6094 00',
+            bic: 'COBADEFFXXX'
+        };
+
+        let currentPaymentMethod = '';
+
+        function showPaymentModal(paymentMethod) {
+            const modal = document.getElementById('paymentModal');
+            const content = document.getElementById('paymentModalContent');
+            currentPaymentMethod = paymentMethod;
+
+            if (paymentMethod === 'paypal') {
+                content.innerHTML = `
+                    <p>You will be redirected to PayPal for payment. Would you like to proceed?</p>
+                `;
+            } else if (paymentMethod === 'iban') {
+                content.innerHTML = `
+                    <p>Please use the following bank details for the transfer:</p>
+                    <div class="bank-details">
+                        <p><strong>Name:</strong> ${BANK_DETAILS.name}</p>
+                        <p><strong>IBAN:</strong> ${BANK_DETAILS.iban}</p>
+                        <p><strong>BIC:</strong> ${BANK_DETAILS.bic}</p>
+                    </div>
+                    <p>Please make sure to include your name and show date in the transfer reference.</p>
+                    <p>Click "Proceed" to confirm that you will make the transfer.</p>
+                `;
             }
+
+            modal.style.display = 'block';
         }
 
-        // Check availability on page load
-        checkAvailability();
+        function cancelPayment() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function proceedWithPayment() {
+            if (currentPaymentMethod === 'paypal') {
+                window.open(PAYPAL_LINK, '_blank');
+            }
+            // Save booking to Google Sheets
+            submitBooking();
+            document.getElementById('paymentModal').style.display = 'none';
+        }
 
         async function handleSubmit(event) {
             event.preventDefault();
             
-            // Basic validation
             if (!validateForm()) {
                 return false;
             }
 
-            // Show loading
+            const paymentMethod = document.getElementById('payment').value;
+            
+            if (paymentMethod === 'paypal' || paymentMethod === 'iban') {
+                showPaymentModal(paymentMethod);
+            } else {
+                // For cash payment, proceed directly
+                submitBooking();
+            }
+
+            return false;
+        }
+
+        async function submitBooking() {
             document.getElementById('loading').style.display = 'block';
             
-            // Prepare booking data
             const formData = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
@@ -168,7 +257,6 @@
             };
 
             try {
-                // Send booking to Google Sheets
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(formData)
@@ -179,7 +267,6 @@
                 if (result.status === 'success') {
                     alert('Booking successful! Thank you for your reservation.');
                     document.getElementById('bookingForm').reset();
-                    checkAvailability(); // Refresh availability
                 } else {
                     alert('There was an error processing your booking. Please try again.');
                 }
@@ -189,10 +276,9 @@
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
-
-            return false;
         }
 
+        // Your existing functions remain the same
         function validateForm() {
             const phone = document.getElementById('phone').value;
             if (phone.length < 10) {
@@ -228,6 +314,24 @@
                     option.text += ' (House Full)';
                     option.disabled = true;
                 }
+            }
+        }
+
+        // Check availability on page load
+        checkAvailability();
+
+        async function checkAvailability() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+                
+                ['hindi', 'telugu'].forEach(show => {
+                    if (data[show] >= 200) {
+                        updateAvailability(show);
+                    }
+                });
+            } catch (error) {
+                console.error('Error checking availability:', error);
             }
         }
     </script>
