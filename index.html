@@ -385,12 +385,14 @@
             };
         
             try {
-                const response = await fetch(SCRIPT_URL, {
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziWKzt_ysi3H4AcoT6NBeZZ99TYRKDcZJIXtZ0yYHhmZN6leyXRW1VU7HSaM4TrEY/exec';
+                const response = await fetch(proxyUrl + SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Origin': 'https://ksdheeraj9.github.io'
                     },
                     body: JSON.stringify(formData)
                 });
@@ -409,7 +411,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert(`Booking error: ${error.message}`);
+                alert('Unable to process booking. Please try again later.');
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
@@ -421,11 +423,14 @@
         async function checkAvailability() {
             try {
                 console.log('Checking availability...');
-                const response = await fetch(SCRIPT_URL, {
+                // Using cors-anywhere as a proxy
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziWKzt_ysi3H4AcoT6NBeZZ99TYRKDcZJIXtZ0yYHhmZN6leyXRW1VU7HSaM4TrEY/exec';
+                const response = await fetch(proxyUrl + SCRIPT_URL, {
                     method: 'GET',
-                    mode: 'cors',
                     headers: {
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Origin': 'https://ksdheeraj9.github.io'
                     }
                 });
                 
@@ -450,7 +455,8 @@
                 
             } catch (error) {
                 console.error('Detailed error:', error);
-                alert('Could not load availability. Error: ' + error.message);
+                // Don't show the error to users, just show a friendly message
+                alert('Could not load availability. Please refresh the page or try again later.');
             }
         }
         
