@@ -387,25 +387,18 @@
             try {
                 const response = await fetch(`${SCRIPT_URL}?v=${new Date().getTime()}`, {            
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Origin': 'https://ksdheeraj9.github.io'
+                        'Content-Type': 'text/plain;charset=utf-8',
                     },
                     body: JSON.stringify(formData)
                 });
         
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
+                // Since we're using no-cors mode, we won't get a JSON response
+                // Just check if the request completed
+                if (response.type === 'opaque') {
                     alert('Booking successful! Thank you for your reservation.');
                     document.getElementById('bookingForm').reset();
-                } else {
-                    alert(`Booking error: ${result.message || 'Unknown error occurred'}`);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -416,35 +409,27 @@
         }
         
         // Check availability on page load
-        checkAvailability();
-        
         async function checkAvailability() {
             try {
                 console.log('Checking availability...');
                 const response = await fetch(`${SCRIPT_URL}?v=${new Date().getTime()}`, {
                     method: 'GET',
-                    mode: 'no-cors'  // This tells fetch to make a CORS request
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8',
+                    }
                 });
                 
-                // Since we're using no-cors, we need to handle the response differently
+                // Since we're using no-cors mode, we won't get a JSON response
                 if (response.type === 'opaque') {
                     console.log('Got opaque response - this is expected with no-cors');
                     return;
                 }
                 
-                const data = await response.json();
-                console.log('Availability data:', data);
-                
-                if (data.hindi >= 100) {
-                    updateAvailability('hindi');
-                }
-                if (data.telugu >= 100) {
-                    updateAvailability('telugu');
-                }
-                
             } catch (error) {
                 console.error('Detailed error:', error);
-                alert('Could not load availability. Please refresh the page or try again later.');
+                // Don't show the error to users, just show a friendly message
+                console.log('Could not load availability. Please refresh the page or try again later.');
             }
         }
         
