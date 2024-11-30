@@ -234,7 +234,7 @@
     
     <script>
         // Replace this with your Google Apps Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyWbgHYfOnMDN2WOGlM7UctKLgzflPUM4DlYPupJL5ZPtzkIvDt-hbPc4PmunpzFyDl/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvHIjR7-5w2PGtZHskjSqG99DW69g5G_MoFqMKC0v9NTDyzTdVplCcOmBWV4Vuefkg/exec';
         const PAYPAL_LINK = 'https://paypal.me/Shivadheeraj?country.x=DE&locale.x=en_US';
         const BANK_DETAILS = {
             name: 'SHIVA D. KAMMA',
@@ -421,16 +421,11 @@
         async function checkAvailability() {
             try {
                 console.log('Checking availability...');
-                // Add cache-busting parameter to avoid caching issues
                 const response = await fetch(`${SCRIPT_URL}?v=${new Date().getTime()}`, {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Origin': 'https://ksdheeraj9.github.io'
-                    }
+                    mode: 'no-cors' // Add this line
                 });
                 
-                console.log('Response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -451,7 +446,6 @@
                 
             } catch (error) {
                 console.error('Detailed error:', error);
-                // Don't show the error to users, just show a friendly message
                 alert('Could not load availability. Please refresh the page or try again later.');
             }
         }
