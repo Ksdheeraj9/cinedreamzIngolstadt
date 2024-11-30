@@ -418,21 +418,37 @@
         
         async function checkAvailability() {
             try {
-                const response = await fetch(SCRIPT_URL);
-                if (!response.ok) throw new Error('Network response was not ok');
+                console.log('Checking availability...');
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log('Availability data:', data);
                 
                 if (data.status === 'error') {
                     throw new Error(data.message);
                 }
                 
-                // Update availability based on counts
-                if (data.hindi >= 100) updateAvailability('hindi');
-                if (data.telugu >= 100) updateAvailability('telugu');
+                if (data.hindi >= 100) {
+                    updateAvailability('hindi');
+                }
+                if (data.telugu >= 100) {
+                    updateAvailability('telugu');
+                }
                 
             } catch (error) {
-                console.error('Error checking availability:', error);
-                alert('Could not load availability. Please try again later.');
+                console.error('Detailed error:', error);
+                alert('Could not load availability. Error: ' + error.message);
             }
         }
         
