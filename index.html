@@ -192,15 +192,7 @@
                     Please enter a valid phone number
                 </div>
             </div>
-            
-            <div class="form-group">
-                <label for="show">Select Show *</label>
-                <select id="show" required>
-                    <option value="">Choose a show</option>
-                    <option value="hindi">Hindi Show (2:00 PM)</option>
-                    <option value="telugu">Telugu Show (6:00 PM)</option>
-                </select>
-            </div>
+
            <!-- Commenting group date selector
              <div class="form-group">
                 <label for="date">Select Date *</label>
@@ -212,7 +204,15 @@
                     <option value="">Choose a date</option>
                 </select>
             </div>
-            
+                        
+            <div class="form-group">
+                <label for="show">Select Show *</label>
+                <select id="show" required>
+                    <option value="">Choose a show</option>
+                    <option value="hindi">Hindi Show (2:00 PM)</option>
+                    <option value="telugu">Telugu Show (6:00 PM)</option>
+                </select>
+            </div>
             <div class="form-group">
                 <label for="payment">Payment Method *</label>
                 <select id="payment" required onchange="updatePaymentField()">
