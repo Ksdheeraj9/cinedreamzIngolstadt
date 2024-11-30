@@ -23,6 +23,8 @@
             max-width: 400px;
             margin: 20px auto;
             display: block;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .form-group {
             margin-bottom: 20px;
@@ -31,6 +33,7 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #333;
         }
         input, select {
             width: 100%;
@@ -42,11 +45,13 @@
         button {
             background-color: #4CAF50;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #45a049;
@@ -54,11 +59,13 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
+            color: #333;
         }
         .loading {
             display: none;
             text-align: center;
             margin-top: 10px;
+            color: #666;
         }
         .modal {
             display: none;
@@ -82,6 +89,7 @@
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
+            gap: 10px;
         }
         .modal-buttons button {
             width: 45%;
@@ -97,6 +105,40 @@
             font-family: monospace;
             font-size: 14px;
         }
+        .phone-format-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        input.invalid {
+            border-color: #dc3545;
+        }
+        .phone-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .country-code {
+            width: 80px !important;
+        }
+        .phone-number {
+            flex: 1;
+        }
+        .payment-info {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .payment-info h3 {
+            margin-top: 0;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -108,14 +150,13 @@
                 <!-- Content will be dynamically inserted -->
             </div>
             <div class="modal-buttons">
-                <button onclick="cancelPayment()">Cancel</button>
+                <button onclick="cancelPayment()" style="background-color: #6c757d;">Cancel</button>
                 <button onclick="proceedWithPayment()" style="background-color: #0070ba;">Proceed</button>
             </div>
         </div>
     </div>
 
     <div class="container">
-        <!-- Rest of your existing HTML remains the same until the script tag -->
         <div class="header">
             <h1>Cine Dreamz Ingolstadt</h1>
             <h2>Movie Booking</h2>
@@ -126,17 +167,33 @@
         <form id="bookingForm" onsubmit="return handleSubmit(event)">
             <div class="form-group">
                 <label for="name">Name *</label>
-                <input type="text" id="name" required>
+                <input type="text" id="name" required placeholder="Enter your full name">
             </div>
 
             <div class="form-group">
                 <label for="email">Email (Optional)</label>
-                <input type="email" id="email">
+                <input type="email" id="email" placeholder="Enter your email address">
             </div>
 
             <div class="form-group">
                 <label for="phone">Phone Number *</label>
-                <input type="tel" id="phone" required>
+                <div class="phone-input-group">
+                    <select id="countryCode" class="country-code" required>
+                        <option value="+49">+49</option>
+                        <option value="+91">+91</option>
+                    </select>
+                    <input type="tel" id="phone" class="phone-number" required 
+                           pattern="[0-9]+" 
+                           oninput="validatePhoneInput(this)"
+                           onblur="validatePhoneNumber()"
+                           placeholder="Enter your phone number">
+                </div>
+                <div class="phone-format-hint">
+                    Format: +49 xxx xxx xxxxx (Germany) or +91 xxxxxxxxxx (India)
+                </div>
+                <div id="phoneError" class="error">
+                    Please enter a valid phone number
+                </div>
             </div>
 
             <div class="form-group">
@@ -177,7 +234,7 @@
 
     <script>
         // Replace this with your Google Apps Script URL
-        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7iCZlUy8ZPbMhd1giBmefBMqDJk8ChQw9EK_DsT9GkJqb-45dRexv9Qur3Lh3YaQU/exec';
         const PAYPAL_LINK = 'https://paypal.me/Shivadheeraj?country.x=DE&locale.x=en_US';
         const BANK_DETAILS = {
             name: 'SHIVA D. KAMMA',
@@ -187,6 +244,9 @@
 
         let currentPaymentMethod = '';
 
+        // Set minimum date to today
+        document.getElementById('date').min = new Date().toISOString().split('T')[0];
+
         function showPaymentModal(paymentMethod) {
             const modal = document.getElementById('paymentModal');
             const content = document.getElementById('paymentModalContent');
@@ -195,6 +255,11 @@
             if (paymentMethod === 'paypal') {
                 content.innerHTML = `
                     <p>You will be redirected to PayPal for payment. Would you like to proceed?</p>
+                    <div class="payment-info">
+                        <h3>Payment Details:</h3>
+                        <p>Amount: €10.00</p>
+                        <p>PayPal ID: Shivadheeraj</p>
+                    </div>
                 `;
             } else if (paymentMethod === 'iban') {
                 content.innerHTML = `
@@ -220,9 +285,69 @@
             if (currentPaymentMethod === 'paypal') {
                 window.open(PAYPAL_LINK, '_blank');
             }
-            // Save booking to Google Sheets
             submitBooking();
             document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function validatePhoneInput(input) {
+            input.value = input.value.replace(/\D/g, '');
+            validatePhoneNumber();
+        }
+
+        function validatePhoneNumber() {
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneInput = document.getElementById('phone');
+            const phoneError = document.getElementById('phoneError');
+            const phoneNumber = phoneInput.value.replace(/\D/g, '');
+            
+            let isValid = false;
+            let errorMessage = '';
+
+            if (countryCode === '+49') {
+                if (phoneNumber.length < 10 || phoneNumber.length > 11) {
+                    errorMessage = 'German phone numbers should be 10-11 digits long';
+                } else {
+                    isValid = true;
+                }
+            } else if (countryCode === '+91') {
+                if (phoneNumber.length !== 10) {
+                    errorMessage = 'Indian phone numbers should be exactly 10 digits';
+                } else {
+                    isValid = true;
+                }
+            }
+
+            phoneInput.classList.toggle('invalid', !isValid);
+            phoneError.style.display = isValid ? 'none' : 'block';
+            phoneError.textContent = errorMessage;
+
+            return isValid;
+        }
+
+        function validateForm() {
+            const name = document.getElementById('name').value;
+            if (name.trim() === '') {
+                alert('Please enter your name');
+                return false;
+            }
+
+            if (!validatePhoneNumber()) {
+                return false;
+            }
+
+            const payment = document.getElementById('payment').value;
+            if (payment === 'cash' && !document.getElementById('acknowledge').checked) {
+                alert('Please acknowledge the cash payment option');
+                return false;
+            }
+
+            return true;
+        }
+
+        function updatePaymentField() {
+            const paymentMethod = document.getElementById('payment').value;
+            const acknowledgement = document.getElementById('acknowledgementDiv');
+            acknowledgement.style.display = paymentMethod === 'cash' ? 'block' : 'none';
         }
 
         async function handleSubmit(event) {
@@ -237,7 +362,6 @@
             if (paymentMethod === 'paypal' || paymentMethod === 'iban') {
                 showPaymentModal(paymentMethod);
             } else {
-                // For cash payment, proceed directly
                 submitBooking();
             }
 
@@ -247,10 +371,14 @@
         async function submitBooking() {
             document.getElementById('loading').style.display = 'block';
             
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phone').value;
+            const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+            
             const formData = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
+                phone: fullPhoneNumber,
                 show: document.getElementById('show').value,
                 date: document.getElementById('date').value,
                 paymentMethod: document.getElementById('payment').value
@@ -278,45 +406,6 @@
             }
         }
 
-        // Your existing functions remain the same
-        function validateForm() {
-            const phone = document.getElementById('phone').value;
-            if (phone.length < 10) {
-                alert('Please enter a valid phone number');
-                return false;
-            }
-
-            const name = document.getElementById('name').value;
-            if (name.trim() === '') {
-                alert('Please enter your name');
-                return false;
-            }
-
-            const payment = document.getElementById('payment').value;
-            if (payment === 'cash' && !document.getElementById('acknowledge').checked) {
-                alert('Please acknowledge the cash payment option');
-                return false;
-            }
-
-            return true;
-        }
-
-        function updatePaymentField() {
-            const paymentMethod = document.getElementById('payment').value;
-            const acknowledgement = document.getElementById('acknowledgementDiv');
-            acknowledgement.style.display = paymentMethod === 'cash' ? 'block' : 'none';
-        }
-
-        function updateAvailability(show) {
-            const showSelect = document.getElementById('show');
-            for (let option of showSelect.options) {
-                if (option.value === show) {
-                    option.text += ' (House Full)';
-                    option.disabled = true;
-                }
-            }
-        }
-
         // Check availability on page load
         checkAvailability();
 
@@ -332,6 +421,24 @@
                 });
             } catch (error) {
                 console.error('Error checking availability:', error);
+            }
+        }
+
+        function updateAvailability(show) {
+            const showSelect = document.getElementById('show');
+            for (let option of showSelect.options) {
+                if (option.value === show) {
+                    option.text += ' (House Full)';
+                    option.disabled = true;
+                }
+            }
+        }
+
+        // Close modal if user clicks outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('paymentModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
             }
         }
     </script>
