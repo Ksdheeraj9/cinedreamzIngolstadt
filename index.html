@@ -155,26 +155,26 @@
             </div>
         </div>
     </div>
-
+    
     <div class="container">
         <div class="header">
             <h1>Cine Dreamz Ingolstadt</h1>
             <h2>Movie Booking</h2>
         </div>
-
+        
         <img src="https://sanskarsavvy.com/wp-content/uploads/2024/11/NEWS-PAGE-HEADERS-57.jpg" alt="Movie Poster" class="poster">
-
+        
         <form id="bookingForm" onsubmit="return handleSubmit(event)">
             <div class="form-group">
                 <label for="name">Name *</label>
                 <input type="text" id="name" required placeholder="Enter your full name">
             </div>
-
+            
             <div class="form-group">
                 <label for="email">Email (Optional)</label>
                 <input type="email" id="email" placeholder="Enter your email address">
             </div>
-
+            
             <div class="form-group">
                 <label for="phone">Phone Number *</label>
                 <div class="phone-input-group">
@@ -183,10 +183,10 @@
                         <option value="+91">+91</option>
                     </select>
                     <input type="tel" id="phone" class="phone-number" required 
-                           pattern="[0-9]+" 
-                           oninput="validatePhoneInput(this)"
-                           onblur="validatePhoneNumber()"
-                           placeholder="Enter your phone number">
+                    pattern="[0-9]+" 
+                    oninput="validatePhoneInput(this)"
+                    onblur="validatePhoneNumber()"
+                    placeholder="Enter your phone number">
                 </div>
                 <div class="phone-format-hint">
                     Format: +49 xxx xxx xxxxx (Germany) or +91 xxxxxxxxxx (India)
@@ -195,7 +195,7 @@
                     Please enter a valid phone number
                 </div>
             </div>
-
+            
             <div class="form-group">
                 <label for="show">Select Show *</label>
                 <select id="show" required>
@@ -204,12 +204,12 @@
                     <option value="telugu">Telugu Show (6:00 PM)</option>
                 </select>
             </div>
-
+            
             <div class="form-group">
                 <label for="date">Select Date *</label>
                 <input type="date" id="date" required>
             </div>
-
+            
             <div class="form-group">
                 <label for="payment">Payment Method *</label>
                 <select id="payment" required onchange="updatePaymentField()">
@@ -219,19 +219,19 @@
                     <option value="cash">Pay in Cash at Theatre</option>
                 </select>
             </div>
-
+            
             <div class="form-group" id="acknowledgementDiv" style="display: none;">
                 <label>
                     <input type="checkbox" id="acknowledge">
                     I acknowledge that I will pay in cash at the theatre before the show
                 </label>
             </div>
-
+            
             <button type="submit">Book Now</button>
         </form>
         <div id="loading" class="loading">Processing your booking...</div>
     </div>
-
+    
     <script>
         // Replace this with your Google Apps Script URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqdlchewwCb8M6wZ8WXpJjBuXj5LqEeirgQMw03CjInrJj_Ng3KruWyAq_5okhD-Sg/exec';
@@ -241,17 +241,17 @@
             iban: 'DE89 7004 0045 0830 6094 00',
             bic: 'COBADEFFXXX'
         };
-
+        
         let currentPaymentMethod = '';
-
+        
         // Set minimum date to today
         document.getElementById('date').min = new Date().toISOString().split('T')[0];
-
+        
         function showPaymentModal(paymentMethod) {
             const modal = document.getElementById('paymentModal');
             const content = document.getElementById('paymentModalContent');
             currentPaymentMethod = paymentMethod;
-
+            
             if (paymentMethod === 'paypal') {
                 content.innerHTML = `
                     <p>You will be redirected to PayPal for payment. Would you like to proceed?</p>
@@ -273,14 +273,14 @@
                     <p>Click "Proceed" to confirm that you will make the transfer.</p>
                 `;
             }
-
+            
             modal.style.display = 'block';
         }
-
+        
         function cancelPayment() {
             document.getElementById('paymentModal').style.display = 'none';
         }
-
+        
         function proceedWithPayment() {
             if (currentPaymentMethod === 'paypal') {
                 window.open(PAYPAL_LINK, '_blank');
@@ -288,12 +288,12 @@
             submitBooking();
             document.getElementById('paymentModal').style.display = 'none';
         }
-
+        
         function validatePhoneInput(input) {
             input.value = input.value.replace(/\D/g, '');
             validatePhoneNumber();
         }
-
+        
         function validatePhoneNumber() {
             const countryCode = document.getElementById('countryCode').value;
             const phoneInput = document.getElementById('phone');
@@ -302,7 +302,7 @@
             
             let isValid = false;
             let errorMessage = '';
-
+            
             if (countryCode === '+49') {
                 if (phoneNumber.length < 10 || phoneNumber.length > 11) {
                     errorMessage = 'German phone numbers should be 10-11 digits long';
@@ -316,47 +316,47 @@
                     isValid = true;
                 }
             }
-
+            
             phoneInput.classList.toggle('invalid', !isValid);
             phoneError.style.display = isValid ? 'none' : 'block';
             phoneError.textContent = errorMessage;
-
+            
             return isValid;
         }
-
+        
         function validateForm() {
             const name = document.getElementById('name').value;
             if (name.trim() === '') {
                 alert('Please enter your name');
                 return false;
             }
-
+            
             if (!validatePhoneNumber()) {
                 return false;
             }
-
+            
             const payment = document.getElementById('payment').value;
             if (payment === 'cash' && !document.getElementById('acknowledge').checked) {
                 alert('Please acknowledge the cash payment option');
                 return false;
             }
-
+            
             return true;
         }
-
+        
         function updatePaymentField() {
             const paymentMethod = document.getElementById('payment').value;
             const acknowledgement = document.getElementById('acknowledgementDiv');
             acknowledgement.style.display = paymentMethod === 'cash' ? 'block' : 'none';
         }
-
+        
         async function handleSubmit(event) {
             event.preventDefault();
             
             if (!validateForm()) {
                 return false;
             }
-
+            
             const paymentMethod = document.getElementById('payment').value;
             
             if (paymentMethod === 'paypal' || paymentMethod === 'iban') {
@@ -364,10 +364,10 @@
             } else {
                 submitBooking();
             }
-
+            
             return false;
         }
-
+        
         async function submitBooking() {
             document.getElementById('loading').style.display = 'block';
             
@@ -383,60 +383,60 @@
                 date: document.getElementById('date').value,
                 paymentMethod: document.getElementById('payment').value
             };
-
+            
             try {
-    const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    
-    if (result.status === 'success') {
-        alert('Booking successful! Thank you for your reservation.');
-        document.getElementById('bookingForm').reset();
-    } else {
-        alert(`Booking error: ${result.message || 'Unknown error occurred'}`);
-    }
-} catch (error) {
-    console.error('Error:', error);
-    alert(`Booking error: ${error.message}`);
-} finally {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert('Booking successful! Thank you for your reservation.');
+                    document.getElementById('bookingForm').reset();
+                } else {
+                    alert(`Booking error: ${result.message || 'Unknown error occurred'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`Booking error: ${error.message}`);
+            } finally {
                 document.getElementById('loading').style.display = 'none';
             }
         }
-
+        
         // Check availability on page load
         checkAvailability();
-
+        
         async function checkAvailability() {
-  try {
-    const response = await fetch(SCRIPT_URL);
-    if (!response.ok) throw new Error('Network response was not ok');
-    const data = await response.json();
-    
-    if (data.status === 'error') {
-      throw new Error(data.message);
-    }
-    
-    // Update availability based on counts
-    if (data.hindi >= 100) updateAvailability('hindi');
-    if (data.telugu >= 100) updateAvailability('telugu');
-    
-  } catch (error) {
-    console.error('Error checking availability:', error);
-    alert('Could not load availability. Please try again later.');
-  }
-}
-
-
+            try {
+                const response = await fetch(SCRIPT_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                
+                if (data.status === 'error') {
+                    throw new Error(data.message);
+                }
+                
+                // Update availability based on counts
+                if (data.hindi >= 100) updateAvailability('hindi');
+                if (data.telugu >= 100) updateAvailability('telugu');
+                
+            } catch (error) {
+                console.error('Error checking availability:', error);
+                alert('Could not load availability. Please try again later.');
+            }
+        }
+        
+        
         function updateAvailability(show) {
             const showSelect = document.getElementById('show');
             for (let option of showSelect.options) {
@@ -446,16 +446,16 @@
                 }
             }
         }
-
+        
         // Close modal if user clicks outside of it
         window.onclick = function(event) {
-          const modal = document.getElementById('paymentModal');
-          const content = document.querySelector('.modal-content');
-          if (event.target === modal && !content.contains(event.target)) {
-            modal.style.display = 'none';
-          }
+            const modal = document.getElementById('paymentModal');
+            const content = document.querySelector('.modal-content');
+            if (event.target === modal && !content.contains(event.target)) {
+                modal.style.display = 'none';
+            }
         };
-
+        
     </script>
 </body>
 </html>
