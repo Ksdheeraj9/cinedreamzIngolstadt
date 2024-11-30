@@ -385,8 +385,7 @@
             };
         
             try {
-                const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziWKzt_ysi3H4AcoT6NBeZZ99TYRKDcZJIXtZ0yYHhmZN6leyXRW1VU7HSaM4TrEY/exec';
-                const response = await fetch(SCRIPT_URL, {
+                const response = await fetch(`${SCRIPT_URL}?v=${new Date().getTime()}`, {            
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -422,9 +421,8 @@
         async function checkAvailability() {
             try {
                 console.log('Checking availability...');
-                // Using cors-anywhere as a proxy
-                const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziWKzt_ysi3H4AcoT6NBeZZ99TYRKDcZJIXtZ0yYHhmZN6leyXRW1VU7HSaM4TrEY/exec';
-                const response = await fetch( SCRIPT_URL, {
+                // Add cache-busting parameter to avoid caching issues
+                const response = await fetch(`${SCRIPT_URL}?v=${new Date().getTime()}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
