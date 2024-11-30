@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Dreamz Ingolstadt - Movie Booking</title>
+    <script>
+        let bookings = {
+            "hindi": 0,
+            "telugu": 0
+        };
+
+        function validateForm() {
+            const show = document.getElementById('show').value;
+            if (bookings[show] >= 200) {
+                alert('Sorry, this show is already House Full!');
+                return false;
+            }
+
+            const phone = document.getElementById('phone').value;
+            if (phone.length < 10) {
+                alert('Please enter a valid phone number');
+                return false;
+            }
+
+            const name = document.getElementById('name').value;
+            if (name.trim() === '') {
+                alert('Please enter your name');
+                return false;
+            }
+
+            const payment = document.getElementById('payment').value;
+            if (payment === 'cash' && !document.getElementById('acknowledge').checked) {
+                alert('Please acknowledge the cash payment option');
+                return false;
+            }
+
+            // Simulate booking
+            bookings[show]++;
+            alert('Booking successful! Thank you for your reservation.');
+            if (bookings[show] >= 200) {
+                updateAvailability(show);
+            }
+            return true;
+        }
+
+        function updatePaymentField() {
+            const paymentMethod = document.getElementById('payment').value;
+            const acknowledgement = document.getElementById('acknowledgementDiv');
+            acknowledgement.style.display = paymentMethod === 'cash' ? 'block' : 'none';
+        }
+
+        function updateAvailability(show) {
+            const showSelect = document.getElementById('show');
+            for (let option of showSelect.options) {
+                if (option.value === show) {
+                    option.text += ' (House Full)';
+                    option.disabled = true;
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .poster {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Cine Dreamz Ingolstadt</h1>
+            <h2>Movie Booking</h2>
+        </div>
+
+        <img src="/api/placeholder/400/600" alt="Movie Poster" class="poster">
+
+        <form onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email (Optional)</label>
+                <input type="email" id="email">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="tel" id="phone" required>
+            </div>
+
+            <div class="form-group">
+                <label for="show">Select Show *</label>
+                <select id="show" required>
+                    <option value="">Choose a show</option>
+                    <option value="hindi">Hindi Show (2:00 PM)</option>
+                    <option value="telugu">Telugu Show (6:00 PM)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Select Date *</label>
+                <input type="date" id="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="payment">Payment Method *</label>
+                <select id="payment" required onchange="updatePaymentField()">
+                    <option value="">Choose payment method</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="iban">IBAN Transfer</option>
+                    <option value="cash">Pay in Cash at Theatre</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="acknowledgementDiv" style="display: none;">
+                <label>
+                    <input type="checkbox" id="acknowledge">
+                    I acknowledge that I will pay in cash at the theatre before the show
+                </label>
+            </div>
+
+            <button type="submit">Book Now</button>
+        </form>
+    </div>
+</body>
+</html>
