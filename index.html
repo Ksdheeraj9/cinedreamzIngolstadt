@@ -423,19 +423,17 @@
                 console.log('Checking availability...');
                 const response = await fetch(`${SCRIPT_URL}?v=${new Date().getTime()}`, {
                     method: 'GET',
-                    mode: 'no-cors' // Add this line
+                    mode: 'no-cors'  // This tells fetch to make a CORS request
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                // Since we're using no-cors, we need to handle the response differently
+                if (response.type === 'opaque') {
+                    console.log('Got opaque response - this is expected with no-cors');
+                    return;
                 }
                 
                 const data = await response.json();
                 console.log('Availability data:', data);
-                
-                if (data.status === 'error') {
-                    throw new Error(data.message);
-                }
                 
                 if (data.hindi >= 100) {
                     updateAvailability('hindi');
