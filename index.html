@@ -257,7 +257,7 @@
                     <p>You will be redirected to PayPal for payment. Would you like to proceed?</p>
                     <div class="payment-info">
                         <h3>Payment Details:</h3>
-                        <p>Amount: €10.00</p>
+                        <p>Amount: €20.00</p>
                         <p>PayPal ID: Shivadheeraj</p>
                     </div>
                 `;
@@ -385,9 +385,8 @@
             };
         
             try {
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
                 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziWKzt_ysi3H4AcoT6NBeZZ99TYRKDcZJIXtZ0yYHhmZN6leyXRW1VU7HSaM4TrEY/exec';
-                const response = await fetch(proxyUrl + SCRIPT_URL, {
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -424,9 +423,8 @@
             try {
                 console.log('Checking availability...');
                 // Using cors-anywhere as a proxy
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
                 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbziWKzt_ysi3H4AcoT6NBeZZ99TYRKDcZJIXtZ0yYHhmZN6leyXRW1VU7HSaM4TrEY/exec';
-                const response = await fetch(proxyUrl + SCRIPT_URL, {
+                const response = await fetch( SCRIPT_URL, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
