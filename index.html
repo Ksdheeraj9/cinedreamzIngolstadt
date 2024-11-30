@@ -234,7 +234,7 @@
     
     <script>
         // Replace this with your Google Apps Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqdlchewwCb8M6wZ8WXpJjBuXj5LqEeirgQMw03CjInrJj_Ng3KruWyAq_5okhD-Sg/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz371uASJdYW7u-LXcF_lhjmyH0GZMI7Dp32A_GarDp-Kx_cld83RwnaoS298HrhyYv/exec';
         const PAYPAL_LINK = 'https://paypal.me/Shivadheeraj?country.x=DE&locale.x=en_US';
         const BANK_DETAILS = {
             name: 'SHIVA D. KAMMA',
@@ -383,16 +383,18 @@
                 date: document.getElementById('date').value,
                 paymentMethod: document.getElementById('payment').value
             };
-            
+        
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify(formData)
                 });
-                
+        
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -423,7 +425,7 @@
                     method: 'GET',
                     mode: 'cors',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     }
                 });
                 
