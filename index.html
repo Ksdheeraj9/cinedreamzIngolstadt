@@ -201,11 +201,20 @@
                     <option value="telugu">Telugu Show (6:00 PM)</option>
                 </select>
             </div>
-            
-            <div class="form-group">
+           <!-- Commenting group date selector
+             <div class="form-group">
                 <label for="date">Select Date *</label>
                 <input type="date" id="date" required>
-            </div>
+            </div> -->
+
+            <div class="form-group">
+              <label for="date">Select Date *</label>
+              <select id="date" required>
+                  <option value="">Choose a date</option>
+                  <option value="2024-12-07">Saturday, December 7, 2024</option>
+                  <option value="2024-12-08">Sunday, December 8, 2024</option>
+              </select>
+          </div>
             
             <div class="form-group">
                 <label for="payment">Payment Method *</label>
@@ -238,12 +247,60 @@
             iban: 'DE89 7004 0045 0830 6094 00',
             bic: 'COBADEFFXXX'
         };
-        
+        const SHOW_DATES = [
+            {
+                date: '2024-12-15',
+                label: 'Sunday, December 15, 2024',
+                hindiShowTime: '2:00 PM',
+                teluguShowTime: '6:00 PM'
+            },
+            {
+                date: '2024-12-20',
+                label: 'Friday, December 20, 2024',
+                hindiShowTime: '2:00 PM',
+                teluguShowTime: '6:00 PM'
+            }
+            // Add more dates as needed
+        ];
+
+        // Function to update available dates in the dropdown
+        function updateAvailableDates() {
+            const dateSelect = document.getElementById('date');
+            dateSelect.innerHTML = '<option value="">Choose a date</option>';
+            
+            // Add each show date as an option
+            SHOW_DATES.forEach(showDate => {
+                // Only add dates that haven't passed
+                if (new Date(showDate.date) >= new Date().setHours(0, 0, 0, 0)) {
+                    dateSelect.innerHTML += `
+                        <option value="${showDate.date}">${showDate.label}</option>
+                    `;
+                }
+            });
+        }
+
+        // Function to update show times based on selected date
+        function updateShowTimes() {
+            const dateSelect = document.getElementById('date');
+            const showSelect = document.getElementById('show');
+            const selectedDate = SHOW_DATES.find(sd => sd.date === dateSelect.value);
+            
+            if (selectedDate) {
+                // Update show options with specific times
+                showSelect.innerHTML = `
+                    <option value="">Choose a show</option>
+                    <option value="hindi">Hindi Show (${selectedDate.hindiShowTime})</option>
+                    <option value="telugu">Telugu Show (${selectedDate.teluguShowTime})</option>
+                `;
+            }
+        }
+
         let currentPaymentMethod = '';
         
         // Set minimum date to today
-        document.getElementById('date').min = new Date().toISOString().split('T')[0];
-        
+        //document.getElementById('date').min = new Date().toISOString().split('T')[0];
+        document.getElementById('date').addEventListener('change', updateShowTimes);
+      
         function showPaymentModal(paymentMethod) {
             const modal = document.getElementById('paymentModal');
             const content = document.getElementById('paymentModalContent');
@@ -480,6 +537,10 @@
                 modal.style.display = 'none';
             }
         };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAvailableDates();
+        });
         
     </script>
 </body>
