@@ -234,7 +234,7 @@
 
     <script>
         // Replace this with your Google Apps Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7iCZlUy8ZPbMhd1giBmefBMqDJk8ChQw9EK_DsT9GkJqb-45dRexv9Qur3Lh3YaQU/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzV5iC5U4oyrTZpY2TkmtpEMk_ItuS1yLmsykrF3uy63WIyAICpPua62gdbArzRx28/exec';
         const PAYPAL_LINK = 'https://paypal.me/Shivadheeraj?country.x=DE&locale.x=en_US';
         const BANK_DETAILS = {
             name: 'SHIVA D. KAMMA',
@@ -385,23 +385,30 @@
             };
 
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(formData)
-                });
+    const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    });
 
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    alert('Booking successful! Thank you for your reservation.');
-                    document.getElementById('bookingForm').reset();
-                } else {
-                    alert('There was an error processing your booking. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('There was an error processing your booking. Please try again.');
-            } finally {
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+        alert('Booking successful! Thank you for your reservation.');
+        document.getElementById('bookingForm').reset();
+    } else {
+        alert(`Booking error: ${result.message || 'Unknown error occurred'}`);
+    }
+} catch (error) {
+    console.error('Error:', error);
+    alert(`Booking error: ${error.message}`);
+} finally {
                 document.getElementById('loading').style.display = 'none';
             }
         }
